@@ -30,75 +30,6 @@ code. Each part of the system lives in its own repository, included here as a Gi
 The root repository tracks the submodule pointers, the shared agent rules in
 [`.claude/rules/`](.claude/rules/) and the Windows launcher [`start-app.bat`](start-app.bat).
 
-## Quick start
-
-Requirements:
-
-- Git
-- Docker Desktop
-- Java 21 JDK
-- Node.js 24 and npm
-
-1. Clone the workspace with its submodules:
-
-   ```bash
-   git clone --recurse-submodules https://github.com/luvax-social/social-media-platforms.git
-   cd social-media-platforms
-   ```
-
-2. Create the environment files from their examples. The comments in each `.env.example`
-   explain every variable.
-
-   ```bash
-   cp backend/.env.example backend/.env
-   cp frontend/.env.example frontend/.env
-   ```
-
-   > Important: the backend will not start without a valid `RESEND_API_KEY` in `backend/.env`.
-   > Resend is its only mail transport, so local runs send real email through your Resend account.
-
-3. Install the frontend dependencies:
-
-   ```bash
-   cd frontend && npm ci && cd ..
-   ```
-
-4. On Windows, double-click `start-app.bat`. It starts the infrastructure containers, then opens
-   one window for the backend and one for the frontend.
-
-Open the app at `http://localhost:5173`. The API listens on `http://localhost:8080/api/v1`, and
-the `dev` profile serves Swagger UI at `http://localhost:8080/swagger-ui`.
-
-### Starting the services by hand
-
-On macOS or Linux, or without the launcher:
-
-```bash
-cd backend
-docker compose up -d          # PostgreSQL, Redis, RabbitMQ, Elasticsearch, Gorse
-./mvnw spring-boot:run        # API on http://localhost:8080
-
-cd ../frontend
-npm run dev                   # app on http://localhost:5173
-```
-
-### Running the observability stack locally
-
-The stack is optional for development. Start it after the backend's containers are up:
-
-```bash
-docker compose -f observability/compose.local.yaml --profile observability up -d
-```
-
-Grafana is then on `http://localhost:3000` and Prometheus on `http://localhost:9090`.
-
-### Running the tests
-
-```bash
-cd backend && ./mvnw verify               # unit and integration tests; Testcontainers needs Docker
-cd frontend && npm run lint && npm test   # ESLint and the Vitest unit suite
-```
-
 ## Architecture
 
 ### How a request flows through the system
@@ -198,6 +129,75 @@ Telemetry is best effort. A missed export is not replayed, and none of it is a s
 | [Backend module docs](https://github.com/luvax-social/backend/tree/main/docs/modules) | Data rules for each backend module, plus the OpenAPI and WebSocket guides |
 | [Coolify runbook](https://github.com/luvax-social/backend/blob/main/docs/ops/COOLIFY_RUNBOOK.md) | How the production deployment is set up |
 | [Observability runbook](https://github.com/luvax-social/observability/blob/main/docs/production-deployment-runbook.md) | Deploying and operating the observability stack |
+
+## Quick start
+
+Requirements:
+
+- Git
+- Docker Desktop
+- Java 21 JDK
+- Node.js 24 and npm
+
+1. Clone the workspace with its submodules:
+
+   ```bash
+   git clone --recurse-submodules https://github.com/luvax-social/social-media-platforms.git
+   cd social-media-platforms
+   ```
+
+2. Create the environment files from their examples. The comments in each `.env.example`
+   explain every variable.
+
+   ```bash
+   cp backend/.env.example backend/.env
+   cp frontend/.env.example frontend/.env
+   ```
+
+   > Important: the backend will not start without a valid `RESEND_API_KEY` in `backend/.env`.
+   > Resend is its only mail transport, so local runs send real email through your Resend account.
+
+3. Install the frontend dependencies:
+
+   ```bash
+   cd frontend && npm ci && cd ..
+   ```
+
+4. On Windows, double-click `start-app.bat`. It starts the infrastructure containers, then opens
+   one window for the backend and one for the frontend.
+
+Open the app at `http://localhost:5173`. The API listens on `http://localhost:8080/api/v1`, and
+the `dev` profile serves Swagger UI at `http://localhost:8080/swagger-ui`.
+
+### Starting the services by hand
+
+On macOS or Linux, or without the launcher:
+
+```bash
+cd backend
+docker compose up -d          # PostgreSQL, Redis, RabbitMQ, Elasticsearch, Gorse
+./mvnw spring-boot:run        # API on http://localhost:8080
+
+cd ../frontend
+npm run dev                   # app on http://localhost:5173
+```
+
+### Running the observability stack locally
+
+The stack is optional for development. Start it after the backend's containers are up:
+
+```bash
+docker compose -f observability/compose.local.yaml --profile observability up -d
+```
+
+Grafana is then on `http://localhost:3000` and Prometheus on `http://localhost:9090`.
+
+### Running the tests
+
+```bash
+cd backend && ./mvnw verify               # unit and integration tests; Testcontainers needs Docker
+cd frontend && npm run lint && npm test   # ESLint and the Vitest unit suite
+```
 
 ## Contributing
 
