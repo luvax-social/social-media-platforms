@@ -70,12 +70,12 @@ Full detail: `backend/.claude/rules/struct.md`
 | Cache | Redis |
 | Message Broker | RabbitMQ |
 | Build | Maven (`./mvnw`) |
-| Migrations | Flyway (126 migrations, V01-V126) |
+| Migrations | Flyway (146 migrations, V01-V147, V144 absent) |
 | Resilience | Resilience4j (Spring Cloud 2025.1.1) |
 | Security | Spring Security 6, JWT |
 | ORM | Spring Data JPA / Hibernate |
 | Formatting | Spotless 2.46.1 (Google AOSP) |
-| Testing | JUnit 5, Testcontainers; 264 test classes |
+| Testing | JUnit 5, Testcontainers; 406 test classes |
 
 ### Application Purpose
 
@@ -110,10 +110,10 @@ See `backend/.claude/rules/struct.md` for each module's sub-packages and
 
 ### Infrastructure Services
 
-- **PostgreSQL** (docker-compose): canonical data store; 126 Flyway migrations, nineteen of which build or drop indexes `CONCURRENTLY` behind a `.sql.conf` sidecar
+- **PostgreSQL** (docker-compose): canonical data store; 146 Flyway migrations, twenty of which build or drop indexes `CONCURRENTLY` behind a `.sql.conf` sidecar
 - **Redis** (docker-compose): token blacklist, one-time email and password-reset tokens, rate limiting.
   Refresh tokens are SHA-256 hashed in PostgreSQL, not Redis
-- **RabbitMQ** (docker-compose): async event delivery. 6 exchanges and 20 durable queues declared in `RabbitMqTopologyConfig`, driving 14 `@RabbitListener` consumers. `social.events` is the topic bus and `social.events.dlx` the dead-letter exchange; `comment.live.events`, `message.live.events`, `notification.live.events` and `post.live.events` are fanout tiers fed by exchange-to-exchange bindings. The 14 consumer classes carry 21 `@RabbitListener` methods between them
+- **RabbitMQ** (docker-compose): async event delivery. 6 exchanges and 26 durable queues declared in `RabbitMqTopologyConfig`, driving 17 `@RabbitListener` consumers. `social.events` is the topic bus and `social.events.dlx` the dead-letter exchange; `comment.live.events`, `message.live.events`, `notification.live.events` and `post.live.events` are fanout tiers fed by exchange-to-exchange bindings. The 17 consumer classes carry 17 `@RabbitListener` methods between them
 - Swagger / OpenAPI at `/api-docs` (dev profile only)
 
 ### Flyway Migrations
@@ -121,9 +121,9 @@ See `backend/.claude/rules/struct.md` for each module's sub-packages and
 V01 extensions/enums → V02 users/auth → V03 settings/push → V04 social → V05 media →
 V06 posts → V07 comments → V08 hashtags → V09 stories → V10 notifications → V11 messages →
 V12 reports → V13 admin → V14 recommendation → V15 indexes → V16 triggers/functions →
-V17 views → V18 metadata config tables → V19-V126 incremental schema evolution
+V17 views → V18 metadata config tables → V19-V147 incremental schema evolution
 
-The full V01-V126 table is in `backend/.claude/rules/struct.md`; it is maintained there rather than
+The full V01-V147 table is in `backend/.claude/rules/struct.md`; it is maintained there rather than
 duplicated here, because a list in two places drifts in one of them.
 
 ### Redis Key Patterns
@@ -160,10 +160,10 @@ Full detail: `frontend/.claude/rules/struct.md`
 | UI Components | shadcn/ui + Radix primitives |
 | Server State | TanStack Query v5 |
 | Global Client State | Zustand v5 (with `persist` middleware) |
-| HTTP Client | Axios v1 (`src/api/axiosClient.js`) |
+| HTTP Client | Axios v1 (`src/api/axiosClient.ts`) |
 | Routing | React Router DOM v7 (centralized config router) |
 | Forms | React Hook Form v7 + Zod v4 |
-| Language | JavaScript (no TypeScript; jsconfig.json for IDE support) |
+| Language | TypeScript (strict; `npm run typecheck`) |
 
 ### Source Tree
 
@@ -177,12 +177,12 @@ src/
 ├── config/         # App constants, route paths, STALE_TIME, HTTP_STATUS
 ├── context/        # Reserved for React context providers
 ├── features/       # Six slices; sizes measured, not estimated
-│   ├── admin/      # Moderation panel: queue, discipline, hashtags, statistics (13795 lines)
-│   ├── auth/       # Login, register, OAuth2 callback, password reset (1629 lines)
-│   ├── luvax/      # Main app shell: Feed, Explore, Profile, Story (16796 lines)
-│   ├── messages/   # Direct conversations and live messaging (4913 lines)
-│   ├── search/     # Search surface (990 lines)
-│   └── support/    # Help centre, tickets, appeals, verification requests (2838 lines)
+│   ├── admin/      # Moderation panel: queue, discipline, hashtags, statistics (15687 lines)
+│   ├── auth/       # Login, register, OAuth2 callback, password reset (1791 lines)
+│   ├── luvax/      # Main app shell: Feed, Explore, Profile, Story (22689 lines)
+│   ├── messages/   # Direct conversations and live messaging, message requests and reactions (6684 lines)
+│   ├── search/     # Search surface (1050 lines)
+│   └── support/    # Help centre, tickets, appeals, verification requests (3607 lines)
 ├── hooks/          # Shared reusable hooks
 ├── pages/          # Route-level pages not yet in a feature module
 ├── routes/         # Central React Router config (createBrowserRouter)
@@ -207,7 +207,7 @@ src/
 | vitest | ^3.2.7 | Test runner |
 | eslint | ^10.3.0 | Linting |
 
-There is no icon-set dependency. The 38 declared packages contain no `lucide-react`, no
+There is no icon-set dependency. The 43 declared packages contain no `lucide-react`, no
 `react-icons` and no `@heroicons`; an earlier revision of this document listed `lucide-react` and
 was wrong.
 
@@ -215,10 +215,13 @@ was wrong.
 
 ```bash
 npm run dev        # Start Vite dev server (via scripts/dev-server.mjs)
-npm run test       # Vitest unit suite (vitest.config.js); what CI runs
-npm run test:live  # Vitest live suite (vitest.live.config.js); needs a running backend
+npm run test       # Vitest unit suite (vitest.config.ts); what CI runs
+npm run test:live  # Vitest live suite (vitest.live.config.ts); needs a running backend
 npm run build      # Production build
 npm run lint       # ESLint
+npm run typecheck  # tsc over the app, test and node configs
+npm run test:e2e   # Playwright specs against stubbed network
+npm run test:e2e:live  # Playwright specs against a running local stack
 npm run preview    # Preview production build
 ```
 
@@ -247,7 +250,7 @@ See `frontend/.env.example` for the full list.
 ### How FE Calls BE
 
 - API base URL: configured via `VITE_API_URL` env var (default: `http://localhost:8080/api/v1`)
-- In dev mode, Vite proxies `/api/v1` to the BE (configured in `frontend/vite.config.js`)
+- In dev mode, Vite proxies `/api/v1` to the BE (configured in `frontend/vite.config.ts`)
 - Auth header: `Authorization: Bearer <accessToken>` injected by `axiosClient` request interceptor
 - Token refresh: automatic on 401 — `axiosClient` intercepts, calls `/auth/refresh`, replays original request
 - Public (unauthenticated) calls use `publicClient`; authenticated calls use `axiosClient`
@@ -262,12 +265,12 @@ See `frontend/.env.example` for the full list.
 
 ### Shared Contracts
 
-- No shared TypeScript types (project uses plain JavaScript on FE side)
+- The frontend declares its own TypeScript types under `frontend/src/types`; there is no package shared with the backend
 - BE OpenAPI spec at `http://localhost:8080/api-docs` (dev profile) is the authoritative contract
 - All BE API responses follow `ApiResponse<T>` wrapper shape; FE consumers must handle this envelope
 
 ### OAuth2
 
 - Google OAuth flow initiated via `VITE_GOOGLE_AUTH_URL` (points to BE)
-- Callback handled at FE route `/oauth2/callback` (`OAuthCallbackPage.jsx`)
+- Callback handled at FE route `/oauth2/callback` (`OAuthCallbackPage.tsx`)
 - BE success handler redirects browser back to FE with `?code=...` query param
