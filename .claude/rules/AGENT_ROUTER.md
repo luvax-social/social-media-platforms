@@ -14,6 +14,18 @@ Before any implementation task, determine your task scope and follow the routing
 | Infrastructure / CI | 1. This file  2. GLOBAL_RULES.md (root)  3. STRUCT.md (root) |
 | Database migration | 1. This file  2. GLOBAL_RULES.md (root)  3. backend/.claude/rules/base.md  4. backend/docs/modules/GLOBAL_RULES.md  5. backend/docs/modules/{module}/DATA_RULES.md |
 
+## Shared Rules
+
+Read the files below for the scopes shown, in addition to the routing table.
+The backend and frontend rule files carry only what is specific to them and point here for the rest.
+
+| File | Read when |
+|------|-----------|
+| `ENGINEERING_STANDARDS.md` | Every task: communication mode, writing and quality standards |
+| `GIT_WORKFLOW.md` | Creating a branch, writing a commit message, or opening a pull request in backend or frontend |
+| `CHANGELOG_RULE.md` | Finishing a task in backend or frontend |
+| `WORKING_DIRECTORY.md` | Writing a plan, report, progress file or scratch file in backend or frontend |
+
 ## Scope Detection Rules
 
 - Task mentions Spring, JPA, RabbitMQ, Redis, Flyway, PostgreSQL, REST endpoint → **Backend**
