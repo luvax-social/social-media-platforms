@@ -33,7 +33,7 @@ patch them client-side.
 |---------|-------|---------|--------------|
 | `follower_count` | `users` | `trg_follow_counts` | `follows` |
 | `following_count` | `users` | `trg_follow_counts` | `follows` |
-| `post_count` | `users` | `trg_post_count` | `posts` |
+| `post_count` | `users` | `trg_post_count`, `trg_post_authors_count`, `trg_post_collaborator_count` | `posts` the user owns or co-authors (accepted `post_collaborators`) |
 | `like_count` | `posts` | `trg_post_like_count` | `post_likes` |
 | `comment_count` | `posts` | `trg_post_comment_count` | `comments` |
 | `save_count` | `posts` | `trg_post_save_count` | `post_saves` |
@@ -42,6 +42,7 @@ patch them client-side.
 | `post_count` | `hashtags` | `trg_hashtag_post_count` | `post_hashtags` |
 | `view_count` | `stories` | `trg_story_view_count` | `story_views` |
 | `like_count` | `stories` | `trg_story_like_count` | `story_likes` (V49) |
+| `post_count` | `places` | `trg_place_post_count` | `posts` (published, not deleted, at the place; V154) |
 
 If a counter appears stale, the correct action is to recalculate from the source join table — not
 to patch the counter directly.

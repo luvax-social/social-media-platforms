@@ -70,12 +70,12 @@ Full detail: `backend/.claude/rules/struct.md`
 | Cache | Redis |
 | Message Broker | RabbitMQ |
 | Build | Maven (`./mvnw`) |
-| Migrations | Flyway (146 migrations, V01-V147, V144 absent) |
+| Migrations | Flyway (163 migrations, V01-V164, V144 absent) |
 | Resilience | Resilience4j (Spring Cloud 2025.1.1) |
 | Security | Spring Security 6, JWT |
 | ORM | Spring Data JPA / Hibernate |
 | Formatting | Spotless 2.46.1 (Google AOSP) |
-| Testing | JUnit 5, Testcontainers; 406 test classes |
+| Testing | JUnit 5, Testcontainers; 420 test classes |
 
 ### Application Purpose
 
@@ -94,7 +94,7 @@ All fifteen modules are implemented; none is an empty scaffold.
 | `users` | Public and private profiles, settings, role and status management |
 | `social` | Follow graph with pending requests for private accounts, block list |
 | `media` | Pre-signed Cloudflare R2 upload URLs, media asset lifecycle |
-| `post` | Post CRUD, likes, saves, views, edit history, Elasticsearch sync |
+| `post` | Post CRUD, drafts, scheduled posts, archive, alt text, people tags, co-authors, stored mentions, likes, saves, views, edit history, places registry (`post/place`), Elasticsearch sync |
 | `comment` | Threaded comments, likes, moderation, live WebSocket fanout |
 | `hashtag` | Normalisation, trending, Elasticsearch sync, active/banned/deleted lifecycle |
 | `story` | 24-hour stories, views, likes, expiry and cleanup |
@@ -110,10 +110,10 @@ See `backend/.claude/rules/struct.md` for each module's sub-packages and
 
 ### Infrastructure Services
 
-- **PostgreSQL** (docker-compose): canonical data store; 146 Flyway migrations, twenty of which build or drop indexes `CONCURRENTLY` behind a `.sql.conf` sidecar
+- **PostgreSQL** (docker-compose): canonical data store; 163 Flyway migrations, twenty-two of which build or drop indexes `CONCURRENTLY` behind a `.sql.conf` sidecar
 - **Redis** (docker-compose): token blacklist, one-time email and password-reset tokens, rate limiting.
   Refresh tokens are SHA-256 hashed in PostgreSQL, not Redis
-- **RabbitMQ** (docker-compose): async event delivery. 6 exchanges and 26 durable queues declared in `RabbitMqTopologyConfig`, driving 17 `@RabbitListener` consumers. `social.events` is the topic bus and `social.events.dlx` the dead-letter exchange; `comment.live.events`, `message.live.events`, `notification.live.events` and `post.live.events` are fanout tiers fed by exchange-to-exchange bindings. The 17 consumer classes carry 17 `@RabbitListener` methods between them
+- **RabbitMQ** (docker-compose): async event delivery. 6 exchanges and 28 durable queues declared in `RabbitMqTopologyConfig`, driving 18 `@RabbitListener` consumers. `social.events` is the topic bus and `social.events.dlx` the dead-letter exchange; `comment.live.events`, `message.live.events`, `notification.live.events` and `post.live.events` are fanout tiers fed by exchange-to-exchange bindings. The 18 consumer classes carry 18 `@RabbitListener` methods between them
 - Swagger / OpenAPI at `/api-docs` (dev profile only)
 
 ### Flyway Migrations
@@ -121,9 +121,9 @@ See `backend/.claude/rules/struct.md` for each module's sub-packages and
 V01 extensions/enums → V02 users/auth → V03 settings/push → V04 social → V05 media →
 V06 posts → V07 comments → V08 hashtags → V09 stories → V10 notifications → V11 messages →
 V12 reports → V13 admin → V14 recommendation → V15 indexes → V16 triggers/functions →
-V17 views → V18 metadata config tables → V19-V147 incremental schema evolution
+V17 views → V18 metadata config tables → V19-V164 incremental schema evolution
 
-The full V01-V147 table is in `backend/.claude/rules/struct.md`; it is maintained there rather than
+The full V01-V164 table is in `backend/.claude/rules/struct.md`; it is maintained there rather than
 duplicated here, because a list in two places drifts in one of them.
 
 ### Redis Key Patterns
@@ -177,11 +177,11 @@ src/
 ├── config/         # App constants, route paths, STALE_TIME, HTTP_STATUS
 ├── context/        # Reserved for React context providers
 ├── features/       # Six slices; sizes measured, not estimated
-│   ├── admin/      # Moderation panel: queue, discipline, hashtags, statistics (15687 lines)
+│   ├── admin/      # Moderation panel: queue, discipline, hashtags, statistics (16289 lines)
 │   ├── auth/       # Login, register, OAuth2 callback, password reset (1791 lines)
-│   ├── luvax/      # Main app shell: Feed, Explore, Profile, Story (22689 lines)
-│   ├── messages/   # Direct conversations and live messaging, message requests and reactions (6684 lines)
-│   ├── search/     # Search surface (1050 lines)
+│   ├── luvax/      # Main app shell: Feed, Explore, Profile, Story (27580 lines)
+│   ├── messages/   # Direct conversations and live messaging, message requests and reactions (6756 lines)
+│   ├── search/     # Search surface (1069 lines)
 │   └── support/    # Help centre, tickets, appeals, verification requests (3607 lines)
 ├── hooks/          # Shared reusable hooks
 ├── pages/          # Route-level pages not yet in a feature module
