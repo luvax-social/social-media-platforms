@@ -288,3 +288,13 @@ Procedure after `gh pr create`:
    requested-changes state. Report the findings and what became of each in the closing message.
 
 This loop never merges the pull request and never enables auto-merge.
+
+**Keep pull requests under 100 changed files.** CodeRabbit does not review a larger pull request, so
+split the work into several pull requests, or open them one after another as the work progresses,
+rather than collecting it into one. Excluding files in `path_filters` does not lower the count.
+
+**Known exception.** The post creation pull requests (`luvax-social/backend#226`, 279 files, and
+`luvax-social/frontend#97`, 114 files) were over the limit and were merged into `develop` without a
+CodeRabbit review. Findings in that code were never surfaced by it, so treat it as unreviewed when
+auditing the area.
+
