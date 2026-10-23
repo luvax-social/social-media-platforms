@@ -28,3 +28,7 @@ Before any implementation task, determine your task scope and follow the routing
 - Changes inside `frontend/` → commit and push to the FE repository only
 - Changes to root-level rule files → commit to the root aggregator repository only
 - Never mix sub-project changes with root-level changes in a single commit
+
+## Pull Request Routing
+
+- After opening any pull request, follow `GLOBAL_RULES.md` section 11: wait for the CodeRabbit review, fix or answer every finding, and only then report the pull request as ready
